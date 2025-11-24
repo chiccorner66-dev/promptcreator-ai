@@ -7,146 +7,70 @@ import {
     Megaphone, AlignLeft, CassetteTape, Eye, Hash, Save,
     LogOut, Play, BrainCircuit, TrendingUp, Layers, 
     Cpu, Target, MonitorPlay, StopCircle, Trash2, ShieldCheck, Network,
-    Coins, PlusCircle, User, Globe
+    Coins, PlusCircle, User, Globe, Lightbulb, Crown, Rocket
 } from 'lucide-react';
-
-// --- FIREBASE IMPORTS (ของจริง) ---
-import { auth, db } from './firebase'; 
-import { 
-    signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup 
-} from 'firebase/auth';
-import { 
-    doc, getDoc, setDoc, updateDoc, onSnapshot 
-} from 'firebase/firestore';
 
 // --- CONFIG ---
 const API_KEY = import.meta.env.VITE_API_KEY || "YOUR_API_KEY";
 const COST_PER_GEN = 5; 
 
-// ==========================================
-// 1. LANDING PAGE (Google Popup Login)
-// ==========================================
-const LandingPage = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  // ฟังก์ชันเรียก Google Popup ของจริง
-  const handleGoogleLogin = async () => {
-    setIsLoggingIn(true);
-    try {
-        const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        
-        // เช็ค/สร้าง User ใน Database
-        const userRef = doc(db, "users", result.user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (!userSnap.exists()) {
-            // ถ้าเป็น User ใหม่ แจก 50 เครดิต
-            await setDoc(userRef, { 
-                credits: 50, 
-                email: result.user.email,
-                displayName: result.user.displayName,
-                photoURL: result.user.photoURL,
-                joinedAt: new Date() 
-            });
-        }
-    } catch (error) {
-        console.error("Login Failed:", error);
-        alert("การเข้าสู่ระบบล้มเหลว: " + error.message);
-    } finally {
-        setIsLoggingIn(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden relative flex flex-col">
-      
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-50 rounded-full blur-[80px] opacity-60"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-pink-50 rounded-full blur-[80px] opacity-60"></div>
-      </div>
-
-      <nav className="max-w-7xl mx-auto w-full px-6 py-8 flex justify-between items-center relative z-10">
-        <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 text-white p-2 rounded-xl shadow-lg"><Clapperboard size={24} /></div>
-          <span className="text-2xl font-black tracking-tight text-slate-900">SEK<span className="text-indigo-600">SCRIPT</span> PRO</span>
-        </div>
-        <button 
-            onClick={handleGoogleLogin} 
-            disabled={isLoggingIn}
-            className="px-6 py-2.5 rounded-full bg-slate-900 text-white font-bold text-sm hover:bg-indigo-600 transition-all shadow-lg disabled:opacity-70"
-        >
-            {isLoggingIn ? 'กำลังเชื่อมต่อ...' : 'เข้าสู่ระบบ'}
-        </button>
-      </nav>
-
-      <main className="flex-1 flex flex-col justify-center items-center text-center px-6 relative z-10 pb-20">
-        
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-500 text-xs font-bold mb-8 shadow-sm">
-            <Cpu size={14} className="text-indigo-500" /> AI-Powered Content Engine
-        </div>
-
-        <div className="flex flex-col items-center gap-2 mb-10">
-            <h1 className="text-3xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.4] py-1">
-              ปฏิวัติการทำ Content Marketing ของคุณ
-            </h1>
-            <h1 className="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight leading-[1.4] py-1">
-              ด้วย AI ที่เน้น Hook แข็งแกร่ง
-            </h1>
-            <h1 className="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight leading-[1.4] py-1">
-              และ Call to Action ที่ชัดเจน
-            </h1>
-        </div>
-
-        <p className="text-lg md:text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
-            ยกระดับขีดความสามารถในการแข่งขัน ด้วยแพลตฟอร์ม <span className="text-slate-900 font-bold">SekScript Pro</span> ผสานเทคโนโลยี Generative AI เข้ากับหลักการตลาดสากล เพื่อสร้างสคริปต์ที่แม่นยำ สื่อสารตรงจุด และสร้างผลลัพธ์ที่วัดผลได้จริง
-        </p>
-
-        {/* Google Login Button (Big) */}
-        <button 
-            onClick={handleGoogleLogin} 
-            disabled={isLoggingIn}
-            className="group relative bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl hover:border-indigo-200 transition-all flex items-center gap-3 disabled:opacity-70"
-        >
-            {isLoggingIn ? (
-                <Sparkles className="animate-spin text-indigo-600" /> 
-            ) : (
-                <svg className="w-6 h-6" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            )}
-            Sign in with Google
-        </button>
-
-      </main>
-    </div>
-  );
+// --- MOCK USER DATA (For Bypass) ---
+const MOCK_USER = {
+    displayName: "SekScript Admin",
+    email: "admin@sekscript.com",
+    photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
 };
 
 // ==========================================
-// 2. SCRIPT GENERATOR (Real Logic)
+// 1. LANDING PAGE
+// ==========================================
+const LandingPage = ({ onLoginSuccess }) => {
+    return (
+        <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden relative flex flex-col">
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-50 rounded-full blur-[100px] opacity-60"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-pink-50 rounded-full blur-[100px] opacity-60"></div>
+            </div>
+            <nav className="max-w-7xl mx-auto w-full px-6 py-6 flex justify-between items-center relative z-10">
+                <div className="flex items-center gap-2">
+                    <div className="bg-indigo-600 text-white p-2 rounded-xl shadow-lg"><Clapperboard size={24} /></div>
+                    <span className="text-2xl font-black tracking-tight text-slate-900">SEK<span className="text-indigo-600">SCRIPT</span> PRO</span>
+                </div>
+                <button onClick={onLoginSuccess} className="px-6 py-2.5 rounded-full bg-slate-900 text-white font-bold text-sm hover:bg-indigo-600 transition-all shadow-lg">เข้าสู่ระบบ</button>
+            </nav>
+            <main className="flex-1 flex flex-col justify-center items-center text-center px-6 relative z-10 pb-20">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-500 text-xs font-bold mb-6 shadow-sm">
+                    <Cpu size={14} className="text-indigo-500" /> AI-Powered Content Engine
+                </div>
+                <h1 className="text-4xl md:text-7xl font-black text-slate-900 mb-6 leading-tight tracking-tight">ปฏิวัติวงการคอนเทนต์ <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600">ด้วยปัญญาประดิษฐ์ชั้นสูง</span></h1>
+                <p className="text-lg text-slate-500 mb-10 max-w-2xl mx-auto">ระบบสร้างสคริปต์วิดีโอไวรัลด้วย AI 3 ผู้เชี่ยวชาญ เพื่อผลลัพธ์ที่แม่นยำที่สุด</p>
+                <button onClick={onLoginSuccess} className="group relative bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl hover:border-indigo-200 transition-all flex items-center gap-3">
+                    <svg className="w-6 h-6" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Sign in with Google
+                </button>
+            </main>
+        </div>
+    );
+};
+
+// ==========================================
+// 2. SCRIPT GENERATOR (Compact Layout)
 // ==========================================
 const ScriptGenerator = ({ user, onLogout }) => {
   const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [results, setResults] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [globalLang, setGlobalLang] = useState('th'); 
   const [copyStatus, setCopyStatus] = useState({}); 
-  const [credits, setCredits] = useState(0); 
+  const [credits, setCredits] = useState(45); 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   
   const textareaRef = useRef(null);
   const profileMenuRef = useRef(null);
 
-  // --- Realtime Credits ---
-  useEffect(() => {
-    if (user?.uid) {
-        const unsubscribe = onSnapshot(doc(db, "users", user.uid), (doc) => {
-            if (doc.exists()) setCredits(doc.data().credits || 0);
-        });
-        return () => unsubscribe();
-    }
-  }, [user]);
-
+  // Auto-resize Textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -170,81 +94,82 @@ const ScriptGenerator = ({ user, onLogout }) => {
      { name: 'green',   main: 'bg-emerald-500', light: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900' },
      { name: 'amber',   main: 'bg-amber-500',   light: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-900' },
      { name: 'violet',  main: 'bg-violet-500',  light: 'bg-violet-50',  border: 'border-violet-200',  text: 'text-violet-900' },
-     { name: 'blue',    main: 'bg-blue-500',    light: 'bg-blue-50',    border: 'border-blue-200',    text: 'text-blue-900' },
-     { name: 'orange',  main: 'bg-orange-500',  light: 'bg-orange-50',  border: 'border-orange-200',  text: 'text-orange-900' },
-     { name: 'lime',    main: 'bg-lime-500',    light: 'bg-lime-50',    border: 'border-lime-200',    text: 'text-lime-900' },
-     { name: 'fuchsia', main: 'bg-fuchsia-500', light: 'bg-fuchsia-50', border: 'border-fuchsia-200', text: 'text-fuchsia-900' },
-     { name: 'indigo',  main: 'bg-indigo-500',  light: 'bg-indigo-50',  border: 'border-indigo-200',  text: 'text-indigo-900' },
   ];
 
   const handleGenerate = async () => {
     if (!topic.trim()) return alert("กรุณาระบุหัวข้อครับ");
-    if (credits < COST_PER_GEN) return alert("เครดิตไม่พอครับ (ลองเติมเงินจำลองดู)");
+    if (credits < COST_PER_GEN) return alert("เครดิตไม่พอครับ");
 
     setLoading(true);
-    setResults([]);
-    
+    setProgress(0);
+
+    const interval = setInterval(() => {
+        setProgress((prev) => {
+            if (prev >= 90) return 90;
+            return prev + (Math.random() * 10);
+        });
+    }, 300);
+
     try {
       const genAI = new GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       const prompt = `
-        ACT AS AN ELITE TEAM OF 3 EXPERTS:
-        1. 🧠 STRATEGIC MARKETER (Focus: Viral Reach & Algorithm)
-        2. ❤️ NEURO-PSYCHOLOGIST (Focus: Emotional Triggers)
-        3. 🎬 FILM DIRECTOR (Focus: Visual Storytelling)
-
-        TOPIC: "${topic}"
-        TASK: Create 10 Viral Short Video Scripts (Max 15s).
+        ACT AS 3 EXPERTS (Marketer, Psychologist, Director). 
+        TOPIC: "${topic}". 
+        TASK: Create 10 Viral Short Video Scripts (15s). 
         OUTPUT JSON ARRAY ONLY (Include BOTH Thai and English):
         [
           {
             "title_th": "Thai Headline", "title_en": "English Headline",
-            "hook_th": "Thai Hook", "hook_en": "English Hook",
+            "hook_th": "Thai Hook Concept", "hook_en": "English Hook Concept",
             "description_th": "Thai Caption", "description_en": "English Caption",
             "hashtags": ["#tag1", "#tag2"],
-            "voiceover_th": "Thai Voice", "voiceover_en": "English Voice",
+            "voiceover_th": "Full Thai Voiceover Script", "voiceover_en": "Full English Voiceover Script",
             "shots": [
-               { "time": "0-5s", "visual_th": "Thai Visual", "visual_en": "English Visual" },
-               { "time": "5-10s", "visual_th": "Thai Visual", "visual_en": "English Visual" },
-               { "time": "10-15s", "visual_th": "Thai Visual", "visual_en": "English Visual" }
+               { "time": "0-5s", "visual_th": "Thai Visual Desc", "visual_en": "English Visual Desc" },
+               { "time": "5-10s", "visual_th": "Thai Visual Desc", "visual_en": "English Visual Desc" },
+               { "time": "10-15s", "visual_th": "Thai Visual Desc", "visual_en": "English Visual Desc" }
             ]
           }
         ]
       `;
 
       const result = await model.generateContent(prompt);
+      clearInterval(interval);
+      setProgress(100);
+      
       const text = result.response.text().replace(/```json|```/g, '').trim();
       setResults(JSON.parse(text));
-      
-      // ตัดเครดิตจริง
-      if (user?.uid) {
-        await updateDoc(doc(db, "users", user.uid), { credits: credits - COST_PER_GEN });
-      }
+      setExpandedIndex(0);
+      setCredits(prev => prev - COST_PER_GEN);
 
     } catch (error) {
       console.error(error);
       alert("Error: " + error.message);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+          setLoading(false);
+          setProgress(0);
+      }, 500);
     }
   };
 
   const handleCopySpecific = (text, id) => {
-      navigator.clipboard.writeText(text);
-      setCopyStatus({ ...copyStatus, [id]: true });
-      setTimeout(() => setCopyStatus({ ...copyStatus, [id]: false }), 2000);
+    navigator.clipboard.writeText(text);
+    setCopyStatus({ ...copyStatus, [id]: true });
+    setTimeout(() => setCopyStatus({ ...copyStatus, [id]: false }), 2000);
   };
 
   const handleSaveFile = (item) => {
-      const content = `TITLE: ${item.title_th}\nHOOK: ${item.hook_th}\nVOICE OVER: "${item.voiceover_th}"\n\nSHOTS:\n${item.shots.map(s => `[${s.time}] ${s.visual_th}`).join('\n')}`;
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `SCRIPT_${item.title_th.substring(0, 10)}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    const content = `TITLE: ${item.title_th}\nHOOK: ${item.hook_th}\nVOICE OVER: "${item.voiceover_th}"\n\nSHOTS:\n${item.shots.map(s => `[${s.time}] ${s.visual_th}`).join('\n')}`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `SCRIPT_${item.title_th.substring(0, 10)}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const toggleAccordion = (index) => { setExpandedIndex(expandedIndex === index ? null : index); };
@@ -253,7 +178,7 @@ const ScriptGenerator = ({ user, onLogout }) => {
     <div className="min-h-screen bg-slate-50 font-sans p-4 md:p-8 pb-20 text-slate-900">
       
       {/* Navbar */}
-      <div className="max-w-3xl mx-auto flex justify-between items-center mb-8 relative z-20">
+      <div className="max-w-3xl mx-auto flex justify-between items-center mb-6 relative z-20">
          <div className="font-black text-xl tracking-tight flex items-center gap-2 text-slate-800">
             <div className="bg-indigo-600 text-white p-1.5 rounded-lg"><Clapperboard size={20} /></div> 
             SEK<span className="text-indigo-600">SCRIPT</span> PRO
@@ -261,18 +186,9 @@ const ScriptGenerator = ({ user, onLogout }) => {
 
          {/* Profile Avatar */}
          <div className="relative" ref={profileMenuRef}>
-            <button 
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="rounded-full border-2 border-white shadow-sm hover:shadow-md transition-all overflow-hidden w-10 h-10 focus:outline-none"
-            >
-                {user.photoURL ? (
-                    <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
-                ) : (
-                    <div className="w-full h-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><User size={20} /></div>
-                )}
+            <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="rounded-full border-2 border-white shadow-sm hover:shadow-md transition-all overflow-hidden w-10 h-10 focus:outline-none">
+                <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
             </button>
-
-            {/* Profile Popup */}
             {showProfileMenu && (
                 <div className="absolute top-12 right-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
                     <div className="flex justify-center mb-3">
@@ -291,11 +207,7 @@ const ScriptGenerator = ({ user, onLogout }) => {
                         <div className="text-xl font-black text-yellow-800">{credits}</div>
                     </div>
                     <div className="space-y-1.5">
-                        <button onClick={() => {
-                             const userRef = doc(db, "users", user.uid);
-                             updateDoc(userRef, { credits: credits + 50 });
-                             alert('เติมเงินสำเร็จ! (จำลอง)');
-                        }} className="w-full py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1.5"><PlusCircle size={14} /> เติมเครดิต</button>
+                        <button onClick={() => alert('ระบบเติมเงินเร็วๆ นี้')} className="w-full py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1.5"><PlusCircle size={14} /> เติมเครดิต</button>
                         <button onClick={onLogout} className="w-full py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 font-bold text-xs transition-all flex items-center justify-center gap-1.5"><LogOut size={14} /> ออกจากระบบ</button>
                     </div>
                 </div>
@@ -303,28 +215,57 @@ const ScriptGenerator = ({ user, onLogout }) => {
          </div>
       </div>
 
-      {/* Header & Input */}
-      <div className="text-center mb-10 max-w-3xl mx-auto">
-        <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-2">INTELLIGENT SCRIPT ENGINE</h1>
-        <p className="text-slate-500 text-sm font-medium">สร้างสคริปต์ไวรัลด้วย AI 3 ผู้เชี่ยวชาญ</p>
+      {/* Header */}
+      <div className="text-center mb-6 max-w-3xl mx-auto">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-1">INTELLIGENT SCRIPT ENGINE</h1>
+        <p className="text-slate-500 text-xs font-bold tracking-widest uppercase">AI 3 ผู้เชี่ยวชาญ • สร้างสคริปต์ไวรัล</p>
       </div>
-      <div className="max-w-3xl mx-auto mb-10">
-         <div className="relative bg-white border border-slate-200 rounded-3xl p-3 shadow-xl shadow-indigo-50">
+
+      {/* Input Section (Moved UP & Compact) */}
+      <div className="max-w-3xl mx-auto mb-8">
+         <div className="relative bg-white border border-slate-200 rounded-2xl p-2 shadow-lg shadow-indigo-50">
             <textarea 
                 value={topic} onChange={(e) => setTopic(e.target.value)}
-                placeholder="ระบุหัวข้อคอนเทนต์ที่ต้องการ..."
-                className="w-full p-4 pr-12 text-lg bg-slate-50 text-slate-900 rounded-2xl border-2 border-transparent focus:border-indigo-100 focus:bg-white transition-all resize-none min-h-[100px] outline-none"
+                placeholder="พิมพ์หัวข้อสินค้า หรือ เรื่องราวที่ต้องการเล่า..."
+                className="w-full p-4 pr-12 text-lg bg-slate-50 text-slate-900 rounded-xl border-2 border-transparent focus:border-indigo-100 focus:bg-white transition-all resize-none min-h-[60px] outline-none placeholder:text-slate-400"
+                rows={1}
             />
             <div className="absolute top-3 right-3 flex gap-1">
-                <button onClick={() => setTopic('')} className="p-2 text-slate-400 hover:text-red-500 rounded-xl transition-all"><Trash2 size={18} /></button>
+                <button onClick={() => setTopic('')} className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition-all"><Trash2 size={16} /></button>
             </div>
+            
             {loading ? (
-                <button className="w-full mt-2 bg-slate-200 text-slate-500 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-wait"><Sparkles className="animate-spin" /> กำลังระดมสมอง...</button>
+                <div className="w-full mt-2 bg-slate-100 rounded-lg h-10 relative overflow-hidden flex items-center justify-center shadow-inner">
+                    <div className="absolute top-0 left-0 h-full bg-indigo-100 transition-all duration-300 ease-out" style={{ width: `${progress}%` }}></div>
+                    <div className="relative z-10 flex items-center gap-2 text-indigo-600 font-bold text-xs animate-pulse">
+                        <Sparkles size={14} className="animate-spin" /> กำลังระดมสมอง... {Math.round(progress)}%
+                    </div>
+                </div>
             ) : (
-                <button onClick={handleGenerate} className="w-full mt-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 active:scale-[0.98]"><Zap className="fill-current" /> สร้างสคริปต์ (-{COST_PER_GEN} Credits)</button>
+                <button onClick={handleGenerate} className="w-full mt-2 bg-indigo-600 text-white py-2.5 rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98] text-sm">
+                    <Zap className="fill-current" size={16} /> สร้างสคริปต์ (-{COST_PER_GEN} Credits)
+                </button>
             )}
          </div>
       </div>
+
+      {/* Guide Section (Moved Down) */}
+      {results.length === 0 && (
+          <div className="max-w-3xl mx-auto mb-8 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div className="bg-indigo-50 w-8 h-8 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-sm">1</div>
+                  <div className="text-left"><h3 className="font-bold text-xs text-slate-800">ใส่หัวข้อ</h3><p className="text-[10px] text-slate-500">เช่น "ขายสบู่ผิวขาว"</p></div>
+              </div>
+              <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div className="bg-pink-50 w-8 h-8 rounded-lg flex items-center justify-center text-pink-600 font-bold text-sm">2</div>
+                  <div className="text-left"><h3 className="font-bold text-xs text-slate-800">เพิ่มสไตล์</h3><p className="text-[10px] text-slate-500">เช่น "ตลก, ดราม่า"</p></div>
+              </div>
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-xl border border-yellow-100 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-all">
+                  <div className="bg-white/60 w-8 h-8 rounded-lg flex items-center justify-center text-yellow-600 font-bold text-sm">3</div>
+                  <div className="text-left"><h3 className="font-bold text-xs text-yellow-900">อัปเกรด Pro</h3><p className="text-[10px] text-yellow-800">ปลดล็อกทุกฟีเจอร์</p></div>
+              </div>
+          </div>
+      )}
 
       {/* Results */}
       <div className="space-y-5 max-w-3xl mx-auto">
@@ -342,6 +283,7 @@ const ScriptGenerator = ({ user, onLogout }) => {
                         </div>
                         {isOpen ? <ChevronUp className={theme.text} /> : <ChevronDown className="text-slate-400" />}
                     </div>
+
                     {isOpen && (
                         <div className="p-6 bg-white border-t border-slate-50 cursor-default">
                            <div className="flex justify-end gap-2 mb-6">
@@ -383,12 +325,16 @@ const ScriptGenerator = ({ user, onLogout }) => {
                                          return (
                                             <div key={s} className="relative flex items-center gap-4">
                                                 <div className="w-14 h-7 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-md shrink-0 z-10">{shot.time}</div>
-                                                <div className="flex-1 bg-white border border-slate-100 p-3 rounded-xl shadow-sm flex items-center gap-3"><Eye size={16} className="text-slate-400 shrink-0" /><span className="text-sm text-slate-700 font-medium">{displayVisual}</span></div>
+                                                <div className="flex-1 bg-white border border-slate-100 p-3 rounded-xl shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+                                                    <Eye size={16} className="text-slate-400 shrink-0" />
+                                                    <span className="text-sm text-slate-700 font-medium">{displayVisual}</span>
+                                                </div>
                                             </div>
                                          )
                                     })}
                                 </div>
                            </div>
+
                         </div>
                     )}
                 </div>
@@ -400,25 +346,28 @@ const ScriptGenerator = ({ user, onLogout }) => {
 };
 
 // ==========================================
-// 4. APP ROOT
+// 3. APP ROOT
 // ==========================================
 const App = () => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+  const handleLoginSuccess = () => {
+     setUser(MOCK_USER);
+  };
 
-  const handleLogout = async () => { await signOut(auth); };
+  const handleLogout = () => {
+     setUser(null);
+  };
 
-  if (loading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
-
-  return !user ? <LandingPage onLoginSuccess={() => {}} /> : <ScriptGenerator user={user} onLogout={handleLogout} />;
+  return (
+    <>
+        {!user ? (
+            <LandingPage onLoginSuccess={handleLoginSuccess} />
+        ) : (
+            <ScriptGenerator user={user} onLogout={handleLogout} />
+        )}
+    </>
+  );
 };
 
 export default App;
