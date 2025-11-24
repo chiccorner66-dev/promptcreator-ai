@@ -1,12 +1,38 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>promptcreator-ai</title>
+    
+    <title>SEKSCRIPT PRO | เครื่องจักรผลิตไวรัล</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              // สั่งให้ใช้ฟอนต์ Sarabun ทั้งเว็บ
+              sans: ['Sarabun', 'sans-serif'],
+            },
+            colors: {
+              // สีแบรนด์เพิ่มเติม (เผื่อใช้)
+              'brand-black': '#0f172a',
+              'brand-purple': '#4f46e5',
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
+  
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
